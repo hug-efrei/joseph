@@ -11,3 +11,6 @@ dist/
 
 # Dossiers temporairess
 tmp/
+
+#Fichier de variables d'environnement
+.env

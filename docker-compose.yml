@@ -3,8 +3,7 @@ services:
     build: .
     container_name: joseph
     ports:
-      - "8090:8080" # Accès via http://IP-DU-PC:8090
+      - "8090:8080"
     volumes:
-      # REMPLACE CE CHEMIN par le chemin réel de ta bibliothèque Calibre sur ton host
-      - C:/books:/books:ro 
+      - $LOCAL_LIBRARY:/books:ro 
     restart: unless-stopped

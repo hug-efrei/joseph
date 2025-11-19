@@ -1,0 +1,10 @@
+services:
+  joseph:
+    build: .
+    container_name: joseph
+    ports:
+      - "8090:8080" # Accès via http://IP-DU-PC:8090
+    volumes:
+      # REMPLACE CE CHEMIN par le chemin réel de ta bibliothèque Calibre sur ton host
+      - C:/Users/hugo.lorien.ext/OneDrive - Nexpublica/Documents/books:/books:ro 
+    restart: unless-stopped

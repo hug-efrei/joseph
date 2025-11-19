@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joseph Library</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Georgia', serif;
+            margin: 0; padding: 0; 
+            background: #ffffff; color: #000000; 
+        }
+
+        /* Header inchangé */
+        header { 
+            border-bottom: 3px solid #000; 
+            padding: 15px; 
+            display: flex; gap: 10px;
+            background: #fff;
+        }
+        input[type="text"] { 
+            flex-grow: 1; padding: 10px; font-size: 1.3rem; 
+            border: 2px solid #000; border-radius: 0;
+        }
+        button.search-btn { 
+            background: #000; color: #fff; border: none; 
+            padding: 0 20px; font-size: 1.3rem; font-weight: bold;
+        }
+
+        /* --- NOUVELLE GRILLE --- */
+        .grid { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: space-between; /* Écarte les éléments */
+            padding: 10px; 
+            max-width: 100%;
+        }
+
+        .book-card { 
+            /* Force 2 livres par ligne (avec une petite marge de sécu) */
+            width: 49%; 
+            margin-bottom: 20px; 
+            
+            /* Layout HORIZONTAL : Image à gauche, Info à droite */
+            display: flex; 
+            flex-direction: row;
+            border: 2px solid #000; 
+            background: #fff;
+            padding: 10px;
+            overflow: hidden; /* Empêche le débordement */
+        }
+
+        /* Colonne GAUCHE (Image) */
+        .cover-col {
+            width: 40%; /* Prend 40% de la carte */
+            flex-shrink: 0; /* Empêche l'image de s'écraser */
+            padding-right: 10px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        
+        .cover { 
+            width: 100%; 
+            height: auto; 
+            object-fit: contain;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+            border: 1px solid #333;
+        }
+
+        /* Colonne DROITE (Infos) */
+        .info-col {
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Pousse le bouton vers le bas */
+            text-align: left; /* Texte aligné à gauche pour la lisibilité */
+        }
+
+        .title { 
+            font-weight: bold; 
+            font-size: 1.1rem; 
+            line-height: 1.3; 
+            margin-bottom: 5px;
+            color: #000;
+        }
+        
+        .author { 
+            font-size: 1rem; 
+            font-style: italic; 
+            color: #444; 
+            margin-bottom: 10px;
+        }
+
+        /* Le bouton prend toute la largeur de la colonne info */
+        .btn-dl {
+            display: block; 
+            width: 100%; 
+            background: #fff; 
+            color: #000; 
+            border: 2px solid #000;
+            padding: 12px 0;
+            text-align: center;
+            text-decoration: none; 
+            font-weight: bold; 
+            font-size: 1rem; 
+            text-transform: uppercase;
+            margin-top: auto; /* Pousse le bouton tout en bas */
+        }
+        .btn-dl:active { background: #000; color: #fff; }
+
+        /* Pagination agrandie pour le tactile */
+        .pagination {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 30px 15px;
+            background: #eee; border-top: 2px solid #000;
+        }
+        .nav-link {
+            text-decoration: none; color: #000;
+            font-weight: bold; font-size: 1.3rem;
+            padding: 15px 30px;
+            border: 2px solid #000; background: #fff;
+        }
+        .nav-link.disabled { opacity: 0.3; border-color: #aaa; background: #eee; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+<header>
+    <form action="/" method="GET" style="display:flex; width:100%; gap:10px;">
+        <input type="text" name="q" placeholder="Rechercher..." value="{{ .Query }}">
+        <button type="submit" class="search-btn">GO</button>
+    </form>
+</header>
+
+<div class="grid">
+    {{ if not .Books }}
+        <p style="width:100%; text-align:center; font-size:1.2rem; margin-top:40px;">Aucun livre trouvé.</p>
+    {{ end }}
+
+    {{ range .Books }}
+    <div class="book-card">
+        <!-- Colonne Image -->
+        <div class="cover-col">
+            <a href="/download/{{.ID}}?path={{.Path}}">
+                <img src="/cover/{{.ID}}?path={{.Path}}" class="cover" alt="cover" loading="lazy">
+            </a>
+        </div>
+        
+        <!-- Colonne Infos -->
+        <div class="info-col">
+            <div>
+                <div class="title">{{ .Title }}</div>
+                <div class="author">{{ .Author }}</div>
+            </div>
+            <a href="/download/{{.ID}}?path={{.Path}}" class="btn-dl">Télécharger</a>
+        </div>
+    </div>
+    {{ end }}
+</div>
+
+<div class="pagination">
+    {{ if gt .Page 1 }}
+        <a href="/?q={{.Query}}&page={{.PrevPage}}" class="nav-link">← Précédent</a>
+    {{ else }}
+        <span class="nav-link disabled">← Précédent</span>
+    {{ end }}
+
+    <span style="font-size: 1.2rem; font-weight:bold;">Page {{ .Page }}</span>
+
+    {{ if .HasNext }}
+        <a href="/?q={{.Query}}&page={{.NextPage}}" class="nav-link">Suivant →</a>
+    {{ else }}
+        <span class="nav-link disabled">Suivant →</span>
+    {{ end }}
+</div>
+
+</body>
+</html>

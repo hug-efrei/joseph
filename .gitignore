@@ -1,0 +1,13 @@
+# Binaires et compilation
+server
+server.exe
+bin/
+dist/
+
+# Fichiers système et IDE
+.DS_Store
+.vscode/
+.idea/
+
+# Dossiers temporairess
+tmp/

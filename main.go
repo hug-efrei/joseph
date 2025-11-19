@@ -55,8 +55,6 @@ func main() {
 
 		args := []interface{}{}
 		if query != "" {
-			// MODIFICATION ICI : Recherche dans le Titre OU (OR) le nom de l'Auteur
-			// Les parenthèses sont importantes pour ne pas casser le "WHERE ... AND" précédent
 			baseQuery += " AND (b.title LIKE ? OR a.name LIKE ?)"
 			args = append(args, "%"+query+"%", "%"+query+"%")
 		}
@@ -105,9 +103,12 @@ func main() {
 		defer file.Close()
 		img, _, err := image.Decode(file)
 		if err == nil {
-			m := resize.Resize(600, 0, img, resize.Lanczos3)
+			m := resize.Resize(150, 0, img, resize.Bilinear)
+
 			c.Header("Content-Type", "image/jpeg")
-			jpeg.Encode(c.Writer, m, nil)
+
+			opts := jpeg.Options{Quality: 60}
+			jpeg.Encode(c.Writer, m, &opts)
 		}
 	})
 

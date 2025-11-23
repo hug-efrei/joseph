@@ -19,7 +19,7 @@ import (
 var (
 	LibraryPath  = getEnv("LIBRARY_PATH", "/books")
 	Port         = getEnv("PORT", "8080")
-	BooksPerPage = 10
+	BooksPerPage = 6
 )
 
 type Book struct {

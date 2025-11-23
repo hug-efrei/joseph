@@ -1,118 +1,127 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .Book.Title }}</title>
     <style>
-        * { box-sizing: border-box; }
-        body { 
-            font-family: 'Georgia', serif; margin: 0; padding: 0; 
-            background: #ffffff; color: #000000; padding-bottom: 40px;
+        * {
+            box-sizing: border-box;
         }
 
-        header { 
-            border-bottom: 3px solid #000; padding: 15px; background: #fff; 
-            position: sticky; top: 0; z-index: 100;
+        body {
+            font-family: 'Georgia', serif;
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+            color: #000000;
+            padding-bottom: 10px;
         }
+
+        header {
+            padding: 10px;
+            border-bottom: 2px solid #000;
+            background: #fff;
+        }
+
         .btn-back {
-            text-decoration: none; color: #000; font-weight: bold; font-size: 1.2rem;
-            display: inline-flex; align-items: center;
+            text-decoration: none;
+            color: #000;
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: block;
         }
 
-        .container { padding: 20px; max-width: 800px; margin: 0 auto; }
-
-        /* Section du haut : Cover + Infos */
-        .top-section { display: flex; gap: 30px; margin-bottom: 30px; }
-
-        .cover-wrapper { 
-            width: 40%; max-width: 300px; flex-shrink: 0; 
-            display: flex; justify-content: center; align-items: flex-start;
-        }
-        .cover { 
-            width: 100%; height: auto; 
-            box-shadow: 5px 5px 0px rgba(0,0,0,0.2); border: 1px solid #333; 
+        .container {
+            padding: 10px;
         }
 
-        .info-wrapper { 
-            flex-grow: 1; display: flex; flex-direction: column; 
+        .title {
+            font-size: 1.4rem;
+            margin: 0 0 5px 0;
+            line-height: 1.1;
         }
-        
-        h1 { margin: 0 0 10px 0; font-size: 1.8rem; line-height: 1.2; }
-        
-        /* Liens cliquables */
-        .author a, .series a { text-decoration: underline; color: inherit; }
-        
-        .author { font-size: 1.3rem; font-style: italic; margin-bottom: 15px; color: #444; }
-        .series { font-size: 1.1rem; font-weight: bold; color: #555; margin-bottom: 25px; }
 
-        .btn-dl-large {
-            background: #000; color: #fff; 
-            padding: 15px; text-align: center; 
-            text-decoration: none; font-weight: bold; font-size: 1.2rem; 
-            text-transform: uppercase; display: block; margin-top: auto;
+        .author {
+            font-size: 1.1rem;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .series {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .cover-container {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .cover {
+            max-width: 120px;
+            height: auto;
             border: 2px solid #000;
         }
-        .btn-dl-large:active { background: #fff; color: #000; }
 
-        /* Section Résumé */
-        .synopsis {
-            font-size: 1.1rem; line-height: 1.6;
-            text-align: justify; border-top: 2px solid #eee; padding-top: 20px;
+        .btn-dl-large {
+            background: #000;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            display: block;
+            width: 100%;
+            border: 2px solid #000;
+            margin-bottom: 15px;
         }
-        /* Gestion du HTML de Calibre */
-        .synopsis p { margin-bottom: 15px; }
 
-        /* --- RESPONSIVE MOBILE --- */
-        @media (max-width: 600px) {
-            .top-section { 
-                flex-direction: column; /* On empile verticalement */
-                align-items: center; text-align: center; gap: 20px;
-            }
-            .cover-wrapper { width: 60%; max-width: 200px; }
-            .info-wrapper { width: 100%; align-items: center; }
-            
-            h1 { font-size: 1.5rem; }
-            .author { font-size: 1.1rem; }
-            .btn-dl-large { width: 100%; margin-top: 20px; }
+        .synopsis {
+            font-size: 1rem;
+            line-height: 1.4;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+        }
+
+        .synopsis p {
+            margin-bottom: 10px;
         }
     </style>
 </head>
+
 <body>
 
-<header>
-    <a href="/" class="btn-back">← Retour</a>
-</header>
+    <header>
+        <a href="/" class="btn-back">← RETOUR</a>
+    </header>
 
-<div class="container">
-    <div class="top-section">
-        <div class="cover-wrapper">
+    <div class="container">
+        <h1 class="title">{{ .Book.Title }}</h1>
+        <div class="author">
+            {{ .Book.Author }}
+            {{ if .Book.Series }}
+            - <span class="series">{{ .Book.Series }} (T{{ .Book.SeriesIndex }})</span>
+            {{ end }}
+        </div>
+
+        <div class="cover-container">
             <img src="/cover/{{.Book.ID}}?path={{.Book.Path}}" class="cover" alt="cover">
         </div>
-        <div class="info-wrapper">
-            <h1>{{ .Book.Title }}</h1>
-            <div class="author">
-                <a href="/?author_id={{.Book.AuthorID}}">{{ .Book.Author }}</a>
-            </div>
-            
-            {{ if .Book.Series }}
-            <div class="series">
-                Série : <a href="/?series_id={{.Book.SeriesID}}">{{ .Book.Series }}</a> 
-                - Tome {{ .Book.SeriesIndex }}
-            </div>
-            {{ end }}
 
-            <a href="/download/{{.Book.ID}}?path={{.Book.Path}}" class="btn-dl-large">
-                Télécharger
-            </a>
+        <a href="/download/{{.Book.ID}}?path={{.Book.Path}}" class="btn-dl-large">
+            TÉLÉCHARGER
+        </a>
+
+        <div class="synopsis">
+            <h3 style="margin-top:0; text-transform:uppercase;">Résumé</h3>
+            {{ .Book.Description | safe }}
         </div>
     </div>
 
-    <div class="synopsis">
-        <h3 style="margin-top:0;">Résumé</h3>
-        {{ .Book.Description | safe }}
-    </div>
-</div>
-
 </body>
+
 </html>

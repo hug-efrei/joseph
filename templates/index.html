@@ -241,8 +241,13 @@
                     - <a href="/?series_id={{.SeriesID}}">{{ .Series }}</a> (T{{ .SeriesIndex }})
                     {{ end }}
                 </div>
-                <div>
-                    <a href="/download/{{.ID}}?path={{.Path}}" class="btn-dl">TÉLÉCHARGER</a>
+                <div style="display: flex; gap: 5px;">
+                    <a href="/download/{{.ID}}?path={{.Path}}" class="btn-dl"
+                        style="text-align: center;">TÉLÉCHARGER</a>
+                    {{ if .HasKepub }}
+                    <a href="/download/{{.ID}}?path={{.Path}}&mode=kepub" class="btn-dl"
+                        style="background: #fff; color: #000; width: auto;">KOBO</a>
+                    {{ end }}
                 </div>
             </div>
         </div>

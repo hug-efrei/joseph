@@ -1,0 +1,45 @@
+# traefik.yml
+# Configuration statique de Traefik
+
+# 1. Activer le support des plugins expérimentaux
+experimental:
+  plugins:
+    proxmox:
+      moduleName: "github.com/NX211/traefik-proxmox-provider"
+      version: "v0.1.2" # Vérifiez la dernière version sur GitHub si nécessaire
+
+# 2. Configurer les providers
+providers:
+  # Provider Docker (si vous l'utilisez déjà, gardez-le)
+  docker:
+    exposedByDefault: false
+  
+  # Provider Proxmox (via le plugin)
+  plugin:
+    proxmox:
+      # URL de votre serveur Proxmox
+      endpoint: "https://192.168.1.100:8006"
+      
+      # Token API (Format: USER@REALM!TOKEN_ID=UUID)
+      # À générer dans Proxmox: Datacenter -> Permissions -> API Tokens
+      apiToken: "root@pam!traefik=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      
+      # Intervalle de mise à jour (en secondes)
+      pollInterval: "10s"
+      
+      # Ignorer les erreurs de certificat (souvent nécessaire pour Proxmox self-signed)
+      insecureSkipVerify: true
+      
+      # (Optionnel) Node spécifique ou clusters
+      # node: "pve1"
+
+# 3. Entrypoints (exemple standard)
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+# 4. Logs (utile pour le debug)
+log:
+  level: INFO # Mettre à DEBUG si le plugin ne semble pas fonctionner

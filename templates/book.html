@@ -112,9 +112,18 @@
             <img src="/cover/{{.Book.ID}}?path={{.Book.Path}}" class="cover" alt="cover">
         </div>
 
-        <a href="/download/{{.Book.ID}}?path={{.Book.Path}}" class="btn-dl-large">
-            TÉLÉCHARGER
-        </a>
+        <div style="display: flex; gap: 10px;">
+            <a href="/download/{{.Book.ID}}?path={{.Book.Path}}" class="btn-dl-large"
+                style="width: auto; padding: 15px 30px;">
+                TÉLÉCHARGER
+            </a>
+            {{ if .Book.HasKepub }}
+            <a href="/download/{{.Book.ID}}?path={{.Book.Path}}&mode=kepub" class="btn-dl-large"
+                style="background: #fff; color: #000; width: auto; padding: 15px 30px;">
+                KOBO
+            </a>
+            {{ end }}
+        </div>
 
         <div class="synopsis">
             <h3 style="margin-top:0; text-transform:uppercase;">Résumé</h3>

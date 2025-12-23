@@ -20,7 +20,7 @@ import (
 var (
 	LibraryPath  = getEnv("LIBRARY_PATH", "/books")
 	Port         = getEnv("PORT", "8080")
-	BooksPerPage = 6
+	BooksPerPage = 24
 )
 
 type Book struct {
@@ -64,6 +64,7 @@ func main() {
 		authorID := c.Query("author_id") // NOUVEAU
 		seriesID := c.Query("series_id") // NOUVEAU
 		pageStr := c.Query("page")
+		searchMode := c.Query("search_mode") // NOUVEAU : Toggle barre de recherche
 
 		page, _ := strconv.Atoi(pageStr)
 		if page < 1 {
@@ -142,11 +143,15 @@ func main() {
 			books = books[:BooksPerPage]
 		}
 
+		// Define showSearch based on explicit mode only
+		showSearch := searchMode == "true"
+
 		// On passe les filtres actuels au template pour la pagination
 		c.HTML(200, "index.html", gin.H{
 			"Books": books, "Query": query,
 			"AuthorID": authorID, "SeriesID": seriesID,
 			"Page": page, "HasNext": hasNext, "PrevPage": page - 1, "NextPage": page + 1,
+			"ShowSearch": showSearch, // NOUVEAU
 		})
 	})
 
@@ -179,6 +184,11 @@ func main() {
 			return
 		}
 
+		// Capture Context params so we can go back
+		backQuery := c.Query("q")
+		backPage := c.Query("page")
+		backSearchMode := c.Query("search_mode")
+
 		if seriesName.Valid {
 			b.Series = seriesName.String
 			b.SeriesID = int(seriesID.Int64)
@@ -188,7 +198,16 @@ func main() {
 			b.Description = description.String
 		}
 
-		c.HTML(200, "book.html", gin.H{"Book": b})
+		c.HTML(200, "book.html", gin.H{
+			"Book":           b,
+			"Description":    description.String,  // Pass raw string for template access
+			"SeriesName":     seriesName.String,   // Pass raw string for template access
+			"SeriesID":       seriesID.Int64,      // Pass raw int64 for template access
+			"SeriesIndex":    seriesIndex.Float64, // Pass raw float64 for template access
+			"BackQuery":      backQuery,
+			"BackPage":       backPage,
+			"BackSearchMode": backSearchMode,
+		})
 	})
 
 	r.GET("/cover/:id", func(c *gin.Context) {

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Joseph Library</title>
     <style>
         * {
@@ -16,106 +16,173 @@
             padding: 0;
             background: #ffffff;
             color: #000000;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+            display: block;
         }
 
-        /* Filtres actifs */
+        /* FILTRES ACTIFS - STYLE RETRO */
         .active-filters {
-            padding: 5px;
-            background: #eee;
-            border-bottom: 2px solid #000;
+            padding: 10px;
+            background: #fff;
+            border-bottom: 3px solid #000;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
 
         .btn-reset {
             font-weight: bold;
             text-decoration: none;
             color: #000;
-            border: 1px solid #000;
-            padding: 2px 5px;
+            border: 2px solid #000;
+            padding: 4px 8px;
             background: #fff;
+            box-shadow: 2px 2px 0 #000;
         }
 
-        /* Liste des livres */
+        .btn-reset:active {
+            box-shadow: none;
+            transform: translate(2px, 2px);
+        }
+
+        /* GRILLE DE LIVRES - LEGACY LAYOUT (INLINE-BLOCK) */
         .book-list {
-            flex-grow: 1;
-            padding: 5px;
+            padding: 10px;
             padding-bottom: 120px;
-            /* Espace pour le footer fixe */
-        }
-
-        /* UTILISATION DE TABLE-LAYOUT POUR FORCER L'ALIGNEMENT SUR KOBO */
-        .book-item {
-            display: table;
             width: 100%;
-            table-layout: fixed;
-            border-bottom: 1px solid #000;
-            padding: 8px 0;
+            box-sizing: border-box;
+            text-align: center;
+            font-size: 0;
         }
 
-        .book-item:last-child {
-            border-bottom: none;
-        }
-
-        .cover-col {
-            display: table-cell;
-            vertical-align: top;
-            width: 70px;
-            /* Largeur fixe */
-            padding-right: 10px;
-        }
-
-        .cover {
-            width: 100%;
-            height: auto;
-            border: 1px solid #000;
-            display: block;
-        }
-
-        .info-col {
-            display: table-cell;
-            vertical-align: top;
-        }
-
-        .title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-bottom: 2px;
-            line-height: 1.1;
-            text-decoration: none;
-            color: #000;
-            display: block;
-        }
-
-        .meta {
-            font-size: 0.9rem;
-            color: #333;
-            margin-bottom: 2px;
-        }
-
-        .meta a {
-            color: #000;
-            text-decoration: underline;
-        }
-
-        .btn-dl {
+        /* CONTENEUR DU LIVRE */
+        .book-container {
             display: inline-block;
+            vertical-align: top;
+            width: 23%;
+            margin: 1%;
+            min-width: 140px;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            text-align: left;
+        }
+
+        /* LA CARTE VISUELLE */
+        .visual-card {
+            border: 3px solid #000;
+            box-shadow: 6px 6px 0px #000;
+            background: #fff;
+            display: block;
+            /* Pas de flex ici */
+            margin-bottom: 4px;
+            /* Réduit l'espace avec le titre */
+            transition: transform 0.1s;
+        }
+
+        .visual-card:active {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        .card-cover-container {
+            width: 100%;
+            padding-top: 150%;
+            /* Ratio 2:3 */
+            position: relative;
+            overflow: hidden;
+            display: block;
+            background-size: cover;
+            background-position: top center;
+            background-repeat: no-repeat;
+            background-color: #eee;
+            border-bottom: 3px solid #000;
+        }
+
+        /* BOUTONS FLUSH - TABLE LAYOUT (NUCLEAR OPTION) */
+        .card-actions-flush {
+            display: table;
+            /* Force le layout tableau */
+            width: 100%;
+            height: 40px;
+            table-layout: fixed;
+            /* Cellules de largeur égale */
+            border-collapse: collapse;
+            /* Pas d'espace entre les cellules */
+        }
+
+        .btn-retro-flush {
+            display: table-cell;
+            /* Se comporte comme une cellule <td> */
+            vertical-align: middle;
+            text-align: center;
             background: #000;
             color: #fff;
-            padding: 6px 12px;
             text-decoration: none;
             font-weight: bold;
-            margin-top: 4px;
             font-size: 0.9rem;
-            border: 1px solid #000;
+            text-transform: uppercase;
+            border: none;
+            height: 100%;
+            padding: 0;
+            margin: 0;
         }
 
-        /* Footer Fixe - Utilisation de left/right 0 pour forcer la largeur */
+        .btn-retro-flush:hover {
+            opacity: 0.9;
+        }
+
+        /* Si on a 2 boutons, séparation table cell */
+        .btn-retro-flush+.btn-retro-flush {
+            border-left: 3px solid #000;
+            background: #fff;
+            color: #000;
+        }
+
+        /* TEXTES (En dessous de la carte) */
+        .metadata-external {
+            text-align: center;
+            padding: 0 4px;
+        }
+
+        .book-title {
+            font-size: 0.9rem;
+            /* Un peu plus petit */
+            font-weight: bold;
+            color: #000;
+            text-decoration: none;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 2px;
+            line-height: 1.1;
+        }
+
+        .book-author {
+            font-size: 0.85rem;
+            color: #444;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 1px;
+        }
+
+        .book-series {
+            font-size: 0.8rem;
+            color: #666;
+            font-style: italic;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* PADDING HEADER/FOOTER IMPROVED */
         .footer-fixed {
             position: fixed;
             bottom: 0;
@@ -123,91 +190,147 @@
             right: 0;
             width: 100%;
             background: #fff;
-            border-top: 2px solid #000;
+            border-top: 4px solid #000;
             z-index: 9999;
-            margin: 0;
-            padding: 0;
+            padding: 10px;
+            /* Plus d'air */
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
         }
 
-        /* Pagination - Table layout pour forcer l'alignement horizontal */
+        /* PAGINATION RETRO - TABLE LAYOUT */
         .pagination {
             display: table;
             width: 100%;
             table-layout: fixed;
-            border-bottom: 1px solid #000;
-            margin: 0;
-            padding: 0;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 12px;
+            /* PLUS D'ESPACE ENTRE BOUTONS */
+            margin-bottom: 0;
+            /* Alignement */
         }
 
-        .nav-link {
+        .nav-btn {
             display: table-cell;
             vertical-align: middle;
-            text-align: center;
-            padding: 12px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            text-decoration: none;
-            color: #000;
+            padding: 0;
+            /* Centrage via vertical-align */
+            border: 3px solid #000;
             background: #fff;
+            color: #000;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-decoration: none;
+            box-shadow: 4px 4px 0 #000;
+            height: 50px;
+            /* Hauteur fixe pour alignement avec Search */
+            line-height: normal;
         }
 
-        .nav-link:first-child {
-            border-right: 2px solid #000;
+        .nav-btn:active {
+            box-shadow: 2px 2px 0 #000;
+            transform: translate(2px, 2px);
         }
 
-        .nav-link.disabled {
-            color: #aaa;
-            background: #f9f9f9;
+        .nav-btn.disabled {
+            opacity: 0.4;
             pointer-events: none;
-            opacity: 0.5;
+            box-shadow: none;
+            border-color: #888;
+            color: #888;
         }
 
-        /* Recherche en bas - Table layout aussi */
-        .search-section {
-            padding: 8px;
-            background: #eee;
-            width: 100%;
-        }
-
-        form {
+        /* SEARCH RETRO - TABLE LAYOUT FIXED */
+        /* [X] [INPUT] [OK] */
+        .search-form {
             display: table;
             width: 100%;
+            table-layout: fixed;
             border-collapse: separate;
-            border-spacing: 5px;
+            border-spacing: 12px;
+            /* GAP 12px */
+            margin: 0;
+            padding: 0;
         }
 
-        .input-wrapper {
+        .search-cell-small {
             display: table-cell;
-            width: 100%;
+            width: 15%;
+            /* 15% pour X et OK */
             vertical-align: middle;
+            padding: 0;
+            height: 50px;
         }
 
-        input[type="text"] {
+        .search-cell-large {
+            display: table-cell;
+            width: 70%;
+            /* 70% pour Input */
+            vertical-align: middle;
+            padding: 0;
+            height: 50px;
+        }
+
+        /* ELEMENTS INTERNES (Block width 100%) */
+        .search-input {
             width: 100%;
-            padding: 10px;
+            height: 50px;
+            padding: 0 10px;
+            border: 3px solid #000;
+            font-family: inherit;
             font-size: 1.1rem;
-            border: 2px solid #000;
-            border-radius: 0;
+            box-shadow: inset 2px 2px 0 #ddd;
             box-sizing: border-box;
+            background: #fff;
+            margin: 0;
+            /* Reset margin */
         }
 
-        .btn-wrapper {
-            display: table-cell;
-            width: 1%;
-            vertical-align: middle;
-        }
-
-        button.search-btn {
-            background: #000;
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            font-size: 1.1rem;
+        .search-submit,
+        .search-cancel {
+            display: block;
+            width: 100%;
+            height: 50px;
+            padding: 0;
+            background: #fff;
+            color: #000;
+            border: 3px solid #000;
             font-weight: bold;
-            white-space: nowrap;
-            border: 2px solid #000;
-            vertical-align: middle;
+            font-size: 1rem;
+            box-shadow: 4px 4px 0 #000;
+            cursor: pointer;
+            box-sizing: border-box;
+            text-align: center;
+            text-decoration: none;
+            line-height: 44px;
+            /* Centrage vertical texte (50px - 6px border) */
+        }
+
+        .search-cancel {
+            font-size: 1.2rem;
+        }
+
+        .search-submit:active,
+        .search-cancel:active {
+            box-shadow: 2px 2px 0 #000;
+            transform: translate(2px, 2px);
+        }
+
+        /* MOBILE - 2 COLS */
+        @media (max-width: 480px) {
+            .book-container {
+                margin: 2% 3% 2% 2%;
+                /* Plus d'espace */
+            }
+        }
+
+        /* DESKTOP - 6 COLS */
+        @media (min-width: 1024px) {
+            .book-container {
+                width: 14.5%;
+                /* ~6 colonnes */
+                margin: 1%;
+            }
         }
     </style>
 </head>
@@ -223,64 +346,72 @@
 
     <div class="book-list">
         {{ if not .Books }}
-        <p style="text-align:center; font-size:1.5rem; margin-top:50px;">Aucun livre trouvé.</p>
+        <p style="width: 100%; text-align:center; font-size:1.5rem; margin-top:50px;">Aucun livre trouvé.</p>
         {{ end }}
 
         {{ range .Books }}
-        <div class="book-item">
-            <div class="cover-col">
-                <a href="/book/{{.ID}}">
-                    <img src="/cover/{{.ID}}?path={{.Path}}" class="cover" alt="cover" loading="lazy">
+        <div class="book-container">
+            <!-- CARTE VISUELLE : COVER + BOUTONS -->
+            <div class="visual-card">
+                <a href="/book/{{.ID}}?q={{$.Query}}&page={{$.Page}}&search_mode={{if $.ShowSearch}}true{{else}}false{{end}}"
+                    class="card-cover-container" style="background-image: url('/cover/{{.ID}}?path={{.Path}}');">
                 </a>
-            </div>
-            <div class="info-col">
-                <a href="/book/{{.ID}}" class="title">{{ .Title }}</a>
-                <div class="meta">
-                    <a href="/?author_id={{.AuthorID}}">{{ .Author }}</a>
-                    {{ if .Series }}
-                    - <a href="/?series_id={{.SeriesID}}">{{ .Series }}</a> (T{{ .SeriesIndex }})
-                    {{ end }}
-                </div>
-                <div style="display: flex; gap: 5px;">
-                    <a href="/download/{{.ID}}?path={{.Path}}" class="btn-dl"
-                        style="text-align: center;">TÉLÉCHARGER</a>
+                <div class="card-actions-flush">
+                    <a href="/download/{{.ID}}?path={{.Path}}" class="btn-retro-flush">EPUB</a>
                     {{ if .HasKepub }}
-                    <a href="/download/{{.ID}}?path={{.Path}}&mode=kepub" class="btn-dl"
-                        style="background: #fff; color: #000; width: auto;">KOBO</a>
+                    <a href="/download/{{.ID}}?path={{.Path}}&mode=kepub" class="btn-retro-flush">KOBO</a>
                     {{ end }}
                 </div>
             </div>
+
+            <!-- METADONNEES SUPPRIMEES SUR DEMANDE -->
         </div>
         {{ end }}
     </div>
 
     <div class="footer-fixed">
+        {{ if .ShowSearch }}
+        <!-- MODE RECHERCHE ACTIVÉ -->
+        <form action="/" method="GET" class="search-form">
+            <!-- X BOUTON (15%) -->
+            <div class="search-cell-small">
+                <a href="/?search_mode=false" class="search-cancel">X</a>
+            </div>
+
+            <!-- INPUT (70%) -->
+            <div class="search-cell-large">
+                <input type="text" name="q" class="search-input" placeholder="Rechercher..." value="{{ .Query }}">
+            </div>
+
+            <!-- OK BOUTON (15%) -->
+            <div class="search-cell-small">
+                <button type="submit" class="search-submit">OK</button>
+            </div>
+        </form>
+        {{ else }}
+        <!-- MODE NAVIGATION (Défaut) -->
         <div class="pagination">
+            <!-- BOUTON RECHERCHE (15% pour être carré et aligné avec X) -->
+            <a href="/?search_mode=true&page={{.Page}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}&q={{.Query}}"
+                class="nav-btn" style="width: 15%; font-size: 1.4rem;">?</a>
+
+            <!-- PRECEDENT (42.5%) -->
             {{ if gt .Page 1 }}
-            <a href="/?q={{.Query}}&page={{.PrevPage}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}"
-                class="nav-link">← PRÉCÉDENT</a>
+            <a href="/?q={{.Query}}&page={{.PrevPage}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}" class="nav-btn"
+                style="width: 42%;">← PRÉC.</a>
             {{ else }}
-            <span class="nav-link disabled">← PRÉCÉDENT</span>
+            <span class="nav-btn disabled" style="width: 42%;">← PRÉC.</span>
             {{ end }}
 
+            <!-- SUIVANT (42.5%) -->
             {{ if .HasNext }}
-            <a href="/?q={{.Query}}&page={{.NextPage}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}"
-                class="nav-link">SUIVANT →</a>
+            <a href="/?q={{.Query}}&page={{.NextPage}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}" class="nav-btn"
+                style="width: 42%;">SUIV. →</a>
             {{ else }}
-            <span class="nav-link disabled">SUIVANT →</span>
+            <span class="nav-btn disabled" style="width: 42%;">SUIV. →</span>
             {{ end }}
         </div>
-
-        <div class="search-section">
-            <form action="/" method="GET">
-                <div class="input-wrapper">
-                    <input type="text" name="q" placeholder="Rechercher un livre..." value="{{ .Query }}">
-                </div>
-                <div class="btn-wrapper">
-                    <button type="submit" class="search-btn">OK</button>
-                </div>
-            </form>
-        </div>
+        {{ end }}
     </div>
 
 </body>

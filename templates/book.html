@@ -16,118 +16,239 @@
             padding: 0;
             background: #ffffff;
             color: #000000;
-            padding-bottom: 10px;
-        }
-
-        header {
-            padding: 10px;
-            border-bottom: 2px solid #000;
-            background: #fff;
-        }
-
-        .btn-back {
-            text-decoration: none;
-            color: #000;
-            font-weight: bold;
-            font-size: 1.2rem;
+            padding-bottom: 90px;
+            /* Espace pour le footer fixe */
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
             display: block;
         }
 
-        .container {
-            padding: 10px;
+        /* MEDIA QUERY MOBILE (Padding texte) */
+        @media (max-width: 480px) {
+            body {
+                padding: 15px 15px 90px 15px;
+                /* Préserver le padding-bottom */
+            }
+
+            .container {
+                width: 100%;
+            }
         }
 
-        .title {
+        /* HEADER TABLE (Side by Side) */
+        .header-table {
+            display: table;
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .cell-cover {
+            display: table-cell;
+            vertical-align: top;
+            width: 35%;
+            /* Couverture plus petite à gauche */
+            padding-right: 15px;
+        }
+
+        .cell-info {
+            display: table-cell;
+            vertical-align: top;
+            text-align: left;
+            /* Texte aligné à gauche */
+        }
+
+        /* LAYOUT PRINCIPAL */
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            padding-top: 20px;
+            /* Espace haut demandé */
+        }
+
+        /* COUVERTURE */
+        .cover-wrapper {
+            width: 100%;
+            /* Prend 100% de sa cell (35% total) */
+            margin: 0;
+            border: 3px solid #000;
+            box-shadow: 4px 4px 0 #000;
+            background: #fff;
+            padding: 2px;
+            /* Petit cadre blanc */
+        }
+
+        .cover-img {
+            width: 100%;
+            padding-top: 150%;
+            /* Ratio 2:3 */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: block;
+        }
+
+        /* INFOS LIVRE */
+        h1 {
             font-size: 1.4rem;
-            margin: 0 0 5px 0;
-            line-height: 1.1;
+            margin-top: 0;
+            line-height: 1.2;
+            border-bottom: none;
+            /* Plus de soulignement global */
+            padding-bottom: 10px;
+            display: block;
+            text-align: left;
+            /* Souligné juste ce qu'il faut */
         }
 
         .author {
-            font-size: 1.1rem;
-            font-style: italic;
-            margin-bottom: 10px;
+            font-size: 1.2rem;
+            margin: 0 0 5px 0;
+            color: #333;
         }
 
         .series {
             font-size: 1rem;
-            font-weight: bold;
+            font-style: italic;
+            color: #555;
+            margin-bottom: 20px;
         }
 
-        .cover-container {
-            text-align: center;
+        /* DESCRIPTION BOX */
+        .desc-box {
+            border: 3px solid #000;
+            padding: 15px;
+            text-align: justify;
+            font-size: 1rem;
+            line-height: 1.4;
+            margin-bottom: 20px;
+            background: #f9f9f9;
+            box-shadow: 4px 4px 0 #ddd;
+        }
+
+        /* BOUTONS D'ACTION - EMPILEMENT (STACK) */
+        .actions-stack {
+            width: 100%;
             margin-bottom: 10px;
         }
 
-        .cover {
-            max-width: 120px;
-            height: auto;
-            border: 2px solid #000;
-        }
-
-        .btn-dl-large {
+        .btn-big {
+            display: block;
+            width: 100%;
+            padding: 15px 0;
+            border: 3px solid #000;
             background: #000;
             color: #fff;
-            padding: 15px;
-            text-align: center;
             text-decoration: none;
             font-weight: bold;
             font-size: 1.2rem;
             text-transform: uppercase;
+            text-align: center;
+            box-shadow: 4px 4px 0 #000;
+            /* Matching nav style */
+            margin-bottom: 12px;
+            /* Espace entre les boutons */
+        }
+
+        .btn-big.secondary {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-big:active {
+            box-shadow: 2px 2px 0 #000;
+            transform: translate(2px, 2px);
+        }
+
+        /* FOOTER FIXE */
+        .footer-fixed {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: #fff;
+            border-top: 4px solid #000;
+            z-index: 9999;
+            padding: 10px;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-back {
             display: block;
             width: 100%;
-            border: 2px solid #000;
-            margin-bottom: 15px;
+            padding: 12px 0;
+            border: 3px solid #000;
+            background: #fff;
+            color: #000;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 4px 4px 0 #000;
+            font-size: 1.2rem;
+            text-align: center;
+            height: 50px;
+            line-height: normal;
         }
 
-        .synopsis {
-            font-size: 1rem;
-            line-height: 1.4;
-            border-top: 1px solid #000;
-            padding-top: 10px;
-        }
-
-        .synopsis p {
-            margin-bottom: 10px;
+        .btn-back:active {
+            box-shadow: 2px 2px 0 #000;
+            transform: translate(2px, 2px);
         }
     </style>
 </head>
 
 <body>
 
-    <header>
-        <a href="/" class="btn-back">← RETOUR</a>
-    </header>
-
     <div class="container">
-        <h1 class="title">{{ .Book.Title }}</h1>
-        <div class="author">
-            {{ .Book.Author }}
-            {{ if .Book.Series }}
-            - <span class="series">{{ .Book.Series }} (T{{ .Book.SeriesIndex }})</span>
-            {{ end }}
+
+        <div class="header-table">
+            <div class="cell-cover">
+                <div class="cover-wrapper">
+                    <div class="cover-img" style="background-image: url('/cover/{{.Book.ID}}?path={{.Book.Path}}');">
+                    </div>
+                </div>
+            </div>
+
+            <div class="cell-info">
+                <h1>{{ .Book.Title }}</h1>
+
+                <div class="author">
+                    Par <a href="/?author_id={{.Book.AuthorID}}" style="color:inherit;">{{ .Book.Author }}</a>
+                </div>
+
+                {{ if .Book.Series }}
+                <div class="series">
+                    Série : <a href="/?series_id={{.Book.SeriesID}}" style="color:inherit;">{{ .Book.Series }}</a> (Tome
+                    {{ .Book.SeriesIndex }})
+                </div>
+                {{ end }}
+            </div>
         </div>
 
-        <div class="cover-container">
-            <img src="/cover/{{.Book.ID}}?path={{.Book.Path}}" class="cover" alt="cover">
-        </div>
-
-        <div style="display: flex; gap: 10px;">
-            <a href="/download/{{.Book.ID}}?path={{.Book.Path}}" class="btn-dl-large"
-                style="width: auto; padding: 15px 30px;">
-                TÉLÉCHARGER
-            </a>
+        <div class="actions-stack">
+            <a href="/download/{{.Book.ID}}?path={{.Book.Path}}" class="btn-big">TÉLÉCHARGER (EPUB)</a>
             {{ if .Book.HasKepub }}
-            <a href="/download/{{.Book.ID}}?path={{.Book.Path}}&mode=kepub" class="btn-dl-large"
-                style="background: #fff; color: #000; width: auto; padding: 15px 30px;">
-                KOBO
-            </a>
+            <a href="/download/{{.Book.ID}}?path={{.Book.Path}}&mode=kepub" class="btn-big secondary">VERSION KOBO</a>
             {{ end }}
         </div>
 
-        <div class="synopsis">
+        {{ if .Book.Description }}
+        <div class="desc-box">
             <h3 style="margin-top:0; text-transform:uppercase;">Résumé</h3>
-            {{ .Book.Description | safe }}
+            {{ .Book.Description }}
+        </div>
+        {{ end }}
+
+    </div>
+
+    <!-- FOOTER FIXE RETRO -->
+    <div class="footer-fixed">
+        <div style="max-width: 600px; margin: 0 auto; width: 100%;">
+            <a href="/?q={{.BackQuery}}&page={{.BackPage}}&search_mode={{.BackSearchMode}}" class="btn-back">←
+                RETOUR</a>
         </div>
     </div>
 

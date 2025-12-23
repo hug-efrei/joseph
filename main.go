@@ -74,7 +74,7 @@ func main() {
 		// Requête de base
 		baseQuery := `
 			SELECT 
-				b.id, b.title, a.name, a.id, b.path, s.name, s.id, b.series_index,
+				b.id, b.title, GROUP_CONCAT(a.name, ', '), a.id, b.path, s.name, s.id, b.series_index,
 				(SELECT COUNT(*) FROM data WHERE book = b.id AND format = 'KEPUB') > 0 as has_kepub
 			FROM books b
 			JOIN books_authors_link bal ON b.id = bal.book
@@ -99,6 +99,8 @@ func main() {
 			baseQuery += " AND s.id = ?"
 			args = append(args, seriesID)
 		}
+
+		baseQuery += " GROUP BY b.id"
 
 		// TRI INTELLIGENT :
 		// Si on regarde une série, on veut l'ordre 1, 2, 3...
@@ -155,7 +157,7 @@ func main() {
 		id := c.Param("id")
 		query := `
 			SELECT 
-				b.id, b.title, a.name, a.id, b.path, s.name, s.id, b.series_index, c.text,
+				b.id, b.title, GROUP_CONCAT(a.name, ', '), a.id, b.path, s.name, s.id, b.series_index, c.text,
 				(SELECT COUNT(*) FROM data WHERE book = b.id AND format = 'KEPUB') > 0 as has_kepub
 			FROM books b
 			JOIN books_authors_link bal ON b.id = bal.book
@@ -164,6 +166,7 @@ func main() {
 			LEFT JOIN series s ON bsl.series = s.id
 			LEFT JOIN comments c ON b.id = c.book
 			WHERE b.id = ?
+			GROUP BY b.id
 		`
 		row := db.QueryRow(query, id)
 

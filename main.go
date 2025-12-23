@@ -66,16 +66,33 @@ func main() {
 		pageStr := c.Query("page")
 		searchMode := c.Query("search_mode") // NOUVEAU : Toggle barre de recherche
 
+		// Détection du terminal pour adapter la pagination
+		userAgent := c.GetHeader("User-Agent")
+		pageSize := BooksPerPage // Défaut desktop (24)
+
+		// Liste de mots-clés pour terminaux mobiles/ereaders
+		uaLower := strings.ToLower(userAgent)
+		isLimited := strings.Contains(uaLower, "kobo") ||
+			strings.Contains(uaLower, "mobile") ||
+			strings.Contains(uaLower, "android") ||
+			strings.Contains(uaLower, "kindle") ||
+			strings.Contains(uaLower, "ipad") ||
+			strings.Contains(uaLower, "iphone")
+
+		if isLimited {
+			pageSize = 8 // 2 lignes sur Kobo (4 cols) ou 4 lignes sur Mobile (2 cols)
+		}
+
 		page, _ := strconv.Atoi(pageStr)
 		if page < 1 {
 			page = 1
 		}
-		offset := (page - 1) * BooksPerPage
+		offset := (page - 1) * pageSize
 
-		// Requête de base
+		// Requête de base avec déduplication des auteurs via GROUP_CONCAT
 		baseQuery := `
 			SELECT 
-				b.id, b.title, a.name, a.id, b.path, s.name, s.id, b.series_index,
+				b.id, b.title, GROUP_CONCAT(a.name, ' & '), a.id, b.path, s.name, s.id, b.series_index,
 				(SELECT COUNT(*) FROM data WHERE book = b.id AND format = 'KEPUB') > 0 as has_kepub
 			FROM books b
 			JOIN books_authors_link bal ON b.id = bal.book
@@ -101,6 +118,9 @@ func main() {
 			args = append(args, seriesID)
 		}
 
+		// Groupement pour éviter les doublons
+		baseQuery += " GROUP BY b.id"
+
 		// TRI INTELLIGENT :
 		// Si on regarde une série, on veut l'ordre 1, 2, 3...
 		// Sinon on veut les derniers ajouts.
@@ -111,7 +131,7 @@ func main() {
 		}
 
 		baseQuery += " LIMIT ? OFFSET ?"
-		args = append(args, BooksPerPage+1, offset)
+		args = append(args, pageSize+1, offset)
 
 		rows, err := db.Query(baseQuery, args...)
 		if err != nil {
@@ -138,9 +158,9 @@ func main() {
 		}
 
 		hasNext := false
-		if len(books) > BooksPerPage {
+		if len(books) > pageSize {
 			hasNext = true
-			books = books[:BooksPerPage]
+			books = books[:pageSize]
 		}
 
 		// Define showSearch based on explicit mode only

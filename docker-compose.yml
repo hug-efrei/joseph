@@ -5,5 +5,5 @@ services:
     ports:
       - "8090:8080"
     volumes:
-      - $LOCAL_LIBRARY:/books:ro 
+      - $LOCAL_LIBRARY:/books
     restart: unless-stopped

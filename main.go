@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"html/template"
 	"image"
 	"image/jpeg"
@@ -10,11 +11,17 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/nfnt/resize"
 )
+
+// Helper pour le recadrage intelligent (Smart Crop)
+type SubImager interface {
+	SubImage(r image.Rectangle) image.Image
+}
 
 // Configuration par défaut
 var (
@@ -36,8 +43,44 @@ type Book struct {
 	HasKepub    bool
 }
 
+// CompactLogger est un middleware Gin minimaliste pour Docker
+func CompactLogger() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		start := time.Now()
+		c.Next()
+
+		latency := time.Since(start)
+		status := c.Writer.Status()
+
+		cacheStatus, _ := c.Get("cache_status")
+		tag := ""
+		if cacheStatus != nil {
+			tag = fmt.Sprintf(" [%s]", cacheStatus)
+		}
+
+		// Format ultra-compact : HH:MM:SS | STATUS | METHOD | LATENCY | PATH [TAG]
+		fmt.Printf("%s | %d | %s | %v | %s%s\n",
+			time.Now().Format("15:04:05"),
+			status,
+			c.Request.Method,
+			latency.Round(time.Microsecond),
+			c.Request.URL.RequestURI(),
+			tag,
+		)
+	}
+}
+
 func main() {
 	LibraryPath = getEnv("LIBRARY_PATH", "/books")
+
+	// Initialisation du dossier de cache (Indispensable pour la persistance via volumes)
+	cacheDir := filepath.Join(LibraryPath, ".cache", "covers")
+	if err := os.MkdirAll(cacheDir, 0755); err != nil {
+		log.Printf("⚠️  ERREUR : Impossible de créer le dossier cache : %v", err)
+	} else {
+		log.Printf("✅ Dossier cache prêt : %s", cacheDir)
+	}
+
 	dbPath := filepath.Join(LibraryPath, "metadata.db")
 	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
 		log.Fatalf("Erreur : Aucune DB trouvée à %s", dbPath)
@@ -50,7 +93,8 @@ func main() {
 	defer db.Close()
 
 	gin.SetMode(gin.ReleaseMode)
-	r := gin.Default()
+	r := gin.New() // Pas de logger par défaut
+	r.Use(CompactLogger(), gin.Recovery())
 
 	r.SetFuncMap(template.FuncMap{
 		"safe": func(s string) template.HTML { return template.HTML(s) },
@@ -230,25 +274,86 @@ func main() {
 		})
 	})
 
+	// Route Image de couverture (Optimisée avec cache disque)
 	r.GET("/cover/:id", func(c *gin.Context) {
-		c.Header("Cache-Control", "public, max-age=604800")
-
+		id := c.Param("id")
 		path := c.Query("path")
+
+		// Définition du chemin de cache
+		cacheDir := filepath.Join(LibraryPath, ".cache", "covers")
+		err := os.MkdirAll(cacheDir, 0755)
+
+		cachePath := filepath.Join(cacheDir, id+"_150.jpg")
+
+		// 1. Vérifier si l'image est déjà en cache
+		if _, err := os.Stat(cachePath); err == nil {
+			c.Set("cache_status", "H")                            // HIT
+			c.Header("Cache-Control", "public, max-age=31536000") // 1 an (immuable)
+			c.File(cachePath)
+			return
+		}
+
+		c.Set("cache_status", "M") // MISS par défaut
+
+		// 2. Sinon, redimensionner et mettre en cache
+		c.Header("Cache-Control", "public, max-age=604800")
 		fullPath := filepath.Join(LibraryPath, path, "cover.jpg")
 		file, err := os.Open(fullPath)
 		if err != nil {
+			c.Set("cache_status", "X")
 			c.Status(404)
 			return
 		}
 		defer file.Close()
 
 		img, _, err := image.Decode(file)
-		if err == nil {
-			m := resize.Resize(150, 0, img, resize.Bilinear)
-			c.Header("Content-Type", "image/jpeg")
-			opts := jpeg.Options{Quality: 60}
-			jpeg.Encode(c.Writer, m, &opts)
+		if err != nil {
+			c.Set("cache_status", "X")
+			c.Status(400) // Image invalide ou corrompue
+			return
 		}
+
+		// --- LOGIQUE SMART CROP (2:3 Ratio) ---
+		bounds := img.Bounds()
+		width := bounds.Dx()
+		height := bounds.Dy()
+		targetRatio := 2.0 / 3.0
+		currentRatio := float64(width) / float64(height)
+
+		var startX, startY, endX, endY int
+		if currentRatio > targetRatio {
+			newWidth := int(float64(height) * targetRatio)
+			startX = (width - newWidth) / 2
+			endX = startX + newWidth
+			endY = height
+		} else {
+			newHeight := int(float64(width) / targetRatio)
+			startY = (height - newHeight) / 2
+			endX = width
+			endY = startY + newHeight
+		}
+
+		rect := image.Rect(startX, startY, endX, endY)
+		if sub, ok := img.(SubImager); ok {
+			img = sub.SubImage(rect)
+		}
+
+		m := resize.Resize(200, 300, img, resize.Lanczos3)
+
+		// Sauvegarder dans le cache
+		out, err := os.Create(cachePath)
+		if err == nil {
+			jpeg.Encode(out, m, &jpeg.Options{Quality: 85})
+			out.Close()
+			c.Set("cache_status", "C") // OK CACHED
+		} else {
+			// On continue de servir l'image même si l'écriture en cache échoue
+			c.Set("cache_status", "X")
+		}
+
+		// Servir l'image
+		c.Header("Content-Type", "image/jpeg")
+		jpeg.Encode(c.Writer, m, &jpeg.Options{Quality: 85})
 	})
 
 	// Route Download

@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .Book.Title }}</title>
     <style>
+        :root {
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --shadow-color-active: rgba(0, 0, 0, 0.7);
+        }
+
         * {
             box-sizing: border-box;
         }
@@ -75,7 +80,7 @@
             /* Prend 100% de sa cell (35% total) */
             margin: 0;
             border: 3px solid #000;
-            box-shadow: 4px 4px 0 #000;
+            box-shadow: 6px 6px 0 var(--shadow-color);
             background: #fff;
             padding: 2px;
             /* Petit cadre blanc */
@@ -126,7 +131,7 @@
             line-height: 1.4;
             margin-bottom: 20px;
             background: #f9f9f9;
-            box-shadow: 4px 4px 0 #ddd;
+            box-shadow: 4px 4px 0 var(--shadow-color);
         }
 
         /* BOUTONS D'ACTION - EMPILEMENT (STACK) */
@@ -147,7 +152,7 @@
             font-size: 1.2rem;
             text-transform: uppercase;
             text-align: center;
-            box-shadow: 4px 4px 0 #000;
+            box-shadow: 4px 4px 0 var(--shadow-color);
             /* Matching nav style */
             margin-bottom: 12px;
             /* Espace entre les boutons */
@@ -159,7 +164,7 @@
         }
 
         .btn-big:active {
-            box-shadow: 2px 2px 0 #000;
+            box-shadow: 2px 2px 0 var(--shadow-color-active);
             transform: translate(2px, 2px);
         }
 
@@ -186,7 +191,7 @@
             color: #000;
             font-weight: bold;
             text-decoration: none;
-            box-shadow: 4px 4px 0 #000;
+            box-shadow: 4px 4px 0 var(--shadow-color);
             font-size: 1.2rem;
             text-align: center;
             height: 50px;
@@ -194,7 +199,7 @@
         }
 
         .btn-back:active {
-            box-shadow: 2px 2px 0 #000;
+            box-shadow: 2px 2px 0 var(--shadow-color-active);
             transform: translate(2px, 2px);
         }
     </style>

@@ -8,7 +8,7 @@
     <style>
         :root {
             --shadow-color: rgba(0, 0, 0, 0.3);
-            --shadow-color-active: rgba(0, 0, 0, 0.7);
+            --shadow-color-active: rgba(0, 0, 0, 0.9);
         }
 
         * {
@@ -123,11 +123,13 @@
             /* Se comporte comme une cellule <td> */
             vertical-align: middle;
             text-align: center;
-            background: #000;
+            background: #777;
+            /* Gris au lieu de noir */
             color: #fff;
             text-decoration: none;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 1.1rem;
+            /* Un peu plus grand pour l'icône */
             text-transform: uppercase;
             border: none;
             height: 100%;
@@ -144,6 +146,8 @@
             border-left: 3px solid #000;
             background: #fff;
             color: #000;
+            font-size: 0.9rem;
+            /* Texte KOBO plus petit */
         }
 
         /* TEXTES (En dessous de la carte) */
@@ -365,7 +369,7 @@
                     class="card-cover-container" style="background-image: url('/cover/{{.ID}}?path={{.Path}}');">
                 </a>
                 <div class="card-actions-flush">
-                    <a href="/download/{{.ID}}?path={{.Path}}" class="btn-retro-flush">EPUB</a>
+                    <a href="/download/{{.ID}}?path={{.Path}}" class="btn-retro-flush">⬇</a>
                     {{ if .HasKepub }}
                     <a href="/download/{{.ID}}?path={{.Path}}&mode=kepub" class="btn-retro-flush">KOBO</a>
                     {{ end }}
@@ -413,17 +417,17 @@
             <!-- PRECEDENT (42.5%) -->
             {{ if gt .Page 1 }}
             <a href="/?q={{.Query}}&page={{.PrevPage}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}&search_mode={{if .ShowSearch}}true{{else}}false{{end}}&last_page={{.LastPage}}"
-                class="nav-btn" style="width: 42.5%;">←</a>
+                class="nav-btn" style="width: 42.5%;">&#9664;</a>
             {{ else }}
-            <div class="nav-btn disabled" style="width: 42.5%;">←</div>
+            <div class="nav-btn disabled" style="width: 42.5%;">&#9664;</div>
             {{ end }}
 
             <!-- SUIVANT (42.5%) -->
             {{ if .HasNext }}
             <a href="/?q={{.Query}}&page={{.NextPage}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}&search_mode={{if .ShowSearch}}true{{else}}false{{end}}&last_page={{.LastPage}}"
-                class="nav-btn" style="width: 42.5%;">→</a>
+                class="nav-btn" style="width: 42.5%;">&#9654;</a>
             {{ else }}
-            <div class="nav-btn disabled" style="width: 42.5%;">→</div>
+            <div class="nav-btn disabled" style="width: 42.5%;">&#9654;</div>
             {{ end }}
         </div>
         {{ end }}

@@ -8,7 +8,7 @@
     <style>
         :root {
             --shadow-color: rgba(0, 0, 0, 0.3);
-            --shadow-color-active: rgba(0, 0, 0, 0.7);
+            --shadow-color-active: rgba(0, 0, 0, 0.9);
         }
 
         * {
@@ -145,7 +145,8 @@
             width: 100%;
             padding: 15px 0;
             border: 3px solid #000;
-            background: #000;
+            background: #777;
+            /* Gris au lieu de noir */
             color: #fff;
             text-decoration: none;
             font-weight: bold;
@@ -234,7 +235,7 @@
         </div>
 
         <div class="actions-stack">
-            <a href="/download/{{.Book.ID}}?path={{.Book.Path}}" class="btn-big">TÉLÉCHARGER (EPUB)</a>
+            <a href="/download/{{.Book.ID}}?path={{.Book.Path}}" class="btn-big">TÉLÉCHARGER ⬇</a>
             {{ if .Book.HasKepub }}
             <a href="/download/{{.Book.ID}}?path={{.Book.Path}}&mode=kepub" class="btn-big secondary">VERSION KOBO</a>
             {{ end }}

@@ -109,6 +109,7 @@ func main() {
 		seriesID := c.Query("series_id") // NOUVEAU
 		pageStr := c.Query("page")
 		searchMode := c.Query("search_mode") // NOUVEAU : Toggle barre de recherche
+		lastPage := c.Query("last_page")     // NOUVEAU : Mémoire navigation
 
 		// Détection du terminal pour adapter la pagination
 		userAgent := c.GetHeader("User-Agent")
@@ -216,6 +217,7 @@ func main() {
 			"AuthorID": authorID, "SeriesID": seriesID,
 			"Page": page, "HasNext": hasNext, "PrevPage": page - 1, "NextPage": page + 1,
 			"ShowSearch": showSearch, // NOUVEAU
+			"LastPage":   lastPage,   // NOUVEAU : Pour le bouton "X" (Retour à la liste)
 		})
 	})
 

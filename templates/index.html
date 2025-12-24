@@ -373,9 +373,16 @@
         {{ if .ShowSearch }}
         <!-- MODE RECHERCHE ACTIVÉ -->
         <form action="/" method="GET" class="search-form">
-            <!-- X BOUTON (15%) -->
+            <!-- PERSISTENCE DES MODES ET FILTRES -->
+            <input type="hidden" name="search_mode" value="true">
+            <input type="hidden" name="author_id" value="{{.AuthorID}}">
+            <input type="hidden" name="series_id" value="{{.SeriesID}}">
+            <input type="hidden" name="last_page" value="{{.LastPage}}">
+
+            <!-- X BOUTON (Retour à la page de navigation mémorisée) -->
             <div class="search-cell-small">
-                <a href="/?search_mode=false" class="search-cancel">X</a>
+                <a href="/?search_mode=false&page={{if .LastPage}}{{.LastPage}}{{else}}1{{end}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}"
+                    class="search-cancel">X</a>
             </div>
 
             <!-- INPUT (70%) -->
@@ -391,24 +398,24 @@
         {{ else }}
         <!-- MODE NAVIGATION (Défaut) -->
         <div class="pagination">
-            <!-- BOUTON RECHERCHE (15% pour être carré et aligné avec X) -->
-            <a href="/?search_mode=true&page={{.Page}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}&q={{.Query}}"
+            <!-- BOUTON RECHERCHE (Memorise la page actuelle dans last_page) -->
+            <a href="/?search_mode=true&page=1&last_page={{.Page}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}&q={{.Query}}"
                 class="nav-btn" style="width: 15%; font-size: 1.4rem;">?</a>
 
             <!-- PRECEDENT (42.5%) -->
             {{ if gt .Page 1 }}
-            <a href="/?q={{.Query}}&page={{.PrevPage}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}" class="nav-btn"
-                style="width: 42%;">← PRÉC.</a>
+            <a href="/?q={{.Query}}&page={{.PrevPage}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}&search_mode={{if .ShowSearch}}true{{else}}false{{end}}&last_page={{.LastPage}}"
+                class="nav-btn" style="width: 42.5%;">←</a>
             {{ else }}
-            <span class="nav-btn disabled" style="width: 42%;">← PRÉC.</span>
+            <div class="nav-btn disabled" style="width: 42.5%;">←</div>
             {{ end }}
 
             <!-- SUIVANT (42.5%) -->
             {{ if .HasNext }}
-            <a href="/?q={{.Query}}&page={{.NextPage}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}" class="nav-btn"
-                style="width: 42%;">SUIV. →</a>
+            <a href="/?q={{.Query}}&page={{.NextPage}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}&search_mode={{if .ShowSearch}}true{{else}}false{{end}}&last_page={{.LastPage}}"
+                class="nav-btn" style="width: 42.5%;">→</a>
             {{ else }}
-            <span class="nav-btn disabled" style="width: 42%;">SUIV. →</span>
+            <div class="nav-btn disabled" style="width: 42.5%;">→</div>
             {{ end }}
         </div>
         {{ end }}

@@ -220,10 +220,10 @@ func main() {
 
 		c.HTML(200, "book.html", gin.H{
 			"Book":           b,
-			"Description":    description.String,  // Pass raw string for template access
-			"SeriesName":     seriesName.String,   // Pass raw string for template access
-			"SeriesID":       seriesID.Int64,      // Pass raw int64 for template access
-			"SeriesIndex":    seriesIndex.Float64, // Pass raw float64 for template access
+			"Description":    template.HTML(description.String), // Interpréter le HTML
+			"SeriesName":     seriesName.String,
+			"SeriesID":       seriesID.Int64,
+			"SeriesIndex":    seriesIndex.Float64,
 			"BackQuery":      backQuery,
 			"BackPage":       backPage,
 			"BackSearchMode": backSearchMode,

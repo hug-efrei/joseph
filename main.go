@@ -389,7 +389,7 @@ func main() {
 			// 3. Fallback to .epub
 			if targetFile == "" {
 				for _, f := range files {
-					if filepath.Ext(f.Name()) == ".epub" {
+					if isPlainEpub(f.Name()) {
 						targetFile = filepath.Join(epubPath, f.Name())
 						break
 					}
@@ -399,7 +399,7 @@ func main() {
 			// Prioritize EPUB for Standard Mode
 			// 1. Try .epub
 			for _, f := range files {
-				if filepath.Ext(f.Name()) == ".epub" {
+				if isPlainEpub(f.Name()) {
 					targetFile = filepath.Join(epubPath, f.Name())
 					break
 				}
@@ -453,4 +453,12 @@ func getEnv(key, fallback string) string {
 		return value
 	}
 	return fallback
+}
+
+// isPlainEpub identifie un vrai .epub natif. filepath.Ext ne suffit pas :
+// il renvoie ".epub" aussi bien pour "livre.epub" que pour "livre.kepub.epub",
+// il faut donc exclure explicitement le double-suffixe kepub.
+func isPlainEpub(name string) bool {
+	lower := strings.ToLower(name)
+	return strings.HasSuffix(lower, ".epub") && !strings.HasSuffix(lower, ".kepub.epub")
 }

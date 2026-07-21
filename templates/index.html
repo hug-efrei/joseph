@@ -128,8 +128,7 @@
             color: #fff;
             text-decoration: none;
             font-weight: bold;
-            font-size: 0.8rem;
-            letter-spacing: -0.02em;
+            font-size: 1rem;
             text-transform: uppercase;
             border: none;
             height: 100%;
@@ -367,7 +366,7 @@
                     class="card-cover-container" style="background-image: url('/cover/{{.ID}}?path={{.Path}}');">
                 </a>
                 <div class="card-actions-flush">
-                    <a href="/download/{{.ID}}?path={{.Path}}" class="btn-retro-flush">Standard</a>
+                    <a href="/download/{{.ID}}?path={{.Path}}" class="btn-retro-flush">Epub</a>
                     {{ if .HasKepub }}
                     <a href="/download/{{.ID}}?path={{.Path}}&mode=kepub" class="btn-retro-flush">Kobo</a>
                     {{ end }}

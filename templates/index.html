@@ -128,12 +128,12 @@
             color: #fff;
             text-decoration: none;
             font-weight: bold;
-            font-size: 1.1rem;
-            /* Un peu plus grand pour l'icône */
+            font-size: 0.8rem;
+            letter-spacing: -0.02em;
             text-transform: uppercase;
             border: none;
             height: 100%;
-            padding: 0;
+            padding: 0 2px;
             margin: 0;
         }
 
@@ -146,8 +146,6 @@
             border-left: 3px solid #000;
             background: #fff;
             color: #000;
-            font-size: 0.9rem;
-            /* Texte KOBO plus petit */
         }
 
         /* TEXTES (En dessous de la carte) */
@@ -369,9 +367,9 @@
                     class="card-cover-container" style="background-image: url('/cover/{{.ID}}?path={{.Path}}');">
                 </a>
                 <div class="card-actions-flush">
-                    <a href="/download/{{.ID}}?path={{.Path}}" class="btn-retro-flush">⬇</a>
+                    <a href="/download/{{.ID}}?path={{.Path}}" class="btn-retro-flush">Standard</a>
                     {{ if .HasKepub }}
-                    <a href="/download/{{.ID}}?path={{.Path}}&mode=kepub" class="btn-retro-flush">KOBO</a>
+                    <a href="/download/{{.ID}}?path={{.Path}}&mode=kepub" class="btn-retro-flush">Kobo</a>
                     {{ end }}
                 </div>
             </div>

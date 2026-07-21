@@ -430,16 +430,17 @@ func main() {
 
 		filename := filepath.Base(targetFile)
 
-		// Kobo Mode Renaming: Ensure it ends in .kepub.epub
-		if isKoboMode {
-			lowerName := strings.ToLower(filename)
-			// Re-evaluating the rename logic based on strict request:
-			// "Je veux juste renomer les .kepub en .kepub.epub"
-			if strings.HasSuffix(lowerName, ".kepub") {
-				filename = filename[:len(filename)-6] + ".kepub.epub"
-			}
+		// Un fichier .kepub brut n'a pas d'extension reconnue par les liseuses/apps
+		// (Apple Books, etc.) : on le renomme en .kepub.epub que ce soit le mode
+		// Kobo ou le mode Standard qui soit retombé dessus faute d'.epub natif.
+		if strings.HasSuffix(strings.ToLower(filename), ".kepub") {
+			filename = filename[:len(filename)-6] + ".kepub.epub"
 		}
 
+		// Go/Alpine ne connaissent pas le type MIME de l'epub par défaut et
+		// retombent sur "application/zip", ce qui empêche Safari/iOS de proposer
+		// "Ouvrir dans Livres". On force le bon type MIME.
+		c.Header("Content-Type", "application/epub+zip")
 		c.Header("Content-Disposition", "attachment; filename=\""+filename+"\"")
 		c.File(targetFile)
 	})

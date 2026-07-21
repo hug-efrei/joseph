@@ -235,9 +235,9 @@
         </div>
 
         <div class="actions-stack">
-            <a href="/download/{{.Book.ID}}?path={{.Book.Path}}" class="btn-big">TÉLÉCHARGER ⬇</a>
+            <a href="/download/{{.Book.ID}}?path={{.Book.Path}}" class="btn-big">Standard ⬇</a>
             {{ if .Book.HasKepub }}
-            <a href="/download/{{.Book.ID}}?path={{.Book.Path}}&mode=kepub" class="btn-big secondary">VERSION KOBO</a>
+            <a href="/download/{{.Book.ID}}?path={{.Book.Path}}&mode=kepub" class="btn-big secondary">Kobo ⬇</a>
             {{ end }}
         </div>
 

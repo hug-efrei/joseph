@@ -13,6 +13,10 @@
 
 set -euo pipefail
 export LC_ALL=C DEBIAN_FRONTEND=noninteractive
+# `pct exec`/cron et autres invocations non interactives n'incluent pas
+# toujours /usr/local/bin dans PATH : on le force dès le départ pour que
+# la détection de Go et `go build` plus bas le trouvent de façon fiable.
+export PATH="/usr/local/go/bin:/usr/local/bin:$PATH"
 
 JOSEPH_REPO="${JOSEPH_REPO:-https://github.com/hug-efrei/joseph.git}"
 JOSEPH_REF="${JOSEPH_REF:-main}"

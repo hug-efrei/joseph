@@ -1,9 +1,6 @@
 # Étape 1 : Compilation
 FROM golang:1.25.4-alpine AS builder
 
-# On a besoin de gcc pour sqlite3 (CGO)
-RUN apk add --no-cache gcc musl-dev
-
 WORKDIR /app
 
 # Optimisation du build : on ne copie que les fichiers de deps d'abord
@@ -12,8 +9,9 @@ RUN go mod download
 
 # Ensuite on copie le code source
 COPY . .
-# Compilation en un binaire statique
-RUN CGO_ENABLED=1 GOOS=linux go build -a -ldflags '-linkmode external -extldflags "-static"' -o server main.go
+# Binaire statique — plus de CGO depuis l'abandon de sqlite3 (Calibre) :
+# tout le catalogue transite maintenant par l'API OPDS de BookOrbit.
+RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-s -w' -o server main.go bookorbit.go
 
 # Étape 2 : Image finale (toute petite)
 FROM alpine:latest

@@ -346,7 +346,7 @@
 
 <body>
 
-    {{ if or .AuthorID .SeriesID .Query }}
+    {{ if or .Author .SeriesID .Query }}
     <div class="active-filters">
         <span>Filtre actif</span>
         <a href="/" class="btn-reset">Tout effacer X</a>
@@ -363,12 +363,12 @@
             <!-- CARTE VISUELLE : COVER + BOUTONS -->
             <div class="visual-card">
                 <a href="/book/{{.ID}}?q={{$.Query}}&page={{$.Page}}&search_mode={{if $.ShowSearch}}true{{else}}false{{end}}"
-                    class="card-cover-container" style="background-image: url('/cover/{{.ID}}?path={{.Path}}');">
+                    class="card-cover-container" style="background-image: url('/cover/{{.ID}}');">
                 </a>
                 <div class="card-actions-flush">
-                    <a href="/download/{{.ID}}?path={{.Path}}" class="btn-retro-flush">Epub</a>
+                    <a href="/download/{{.ID}}" class="btn-retro-flush">Epub</a>
                     {{ if .HasKepub }}
-                    <a href="/download/{{.ID}}?path={{.Path}}&mode=kepub" class="btn-retro-flush">Kobo</a>
+                    <a href="/download/{{.ID}}?mode=kepub" class="btn-retro-flush">Kobo</a>
                     {{ end }}
                 </div>
             </div>
@@ -384,13 +384,13 @@
         <form action="/" method="GET" class="search-form">
             <!-- PERSISTENCE DES MODES ET FILTRES -->
             <input type="hidden" name="search_mode" value="true">
-            <input type="hidden" name="author_id" value="{{.AuthorID}}">
+            <input type="hidden" name="author" value="{{.Author}}">
             <input type="hidden" name="series_id" value="{{.SeriesID}}">
             <input type="hidden" name="last_page" value="{{.LastPage}}">
 
             <!-- X BOUTON (Retour à la page de navigation mémorisée) -->
             <div class="search-cell-small">
-                <a href="/?search_mode=false&page={{if .LastPage}}{{.LastPage}}{{else}}1{{end}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}"
+                <a href="/?search_mode=false&page={{if .LastPage}}{{.LastPage}}{{else}}1{{end}}&author={{.Author}}&series_id={{.SeriesID}}"
                     class="search-cancel">X</a>
             </div>
 
@@ -408,12 +408,12 @@
         <!-- MODE NAVIGATION (Défaut) -->
         <div class="pagination">
             <!-- BOUTON RECHERCHE (Memorise la page actuelle dans last_page) -->
-            <a href="/?search_mode=true&page=1&last_page={{.Page}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}&q={{.Query}}"
+            <a href="/?search_mode=true&page=1&last_page={{.Page}}&author={{.Author}}&series_id={{.SeriesID}}&q={{.Query}}"
                 class="nav-btn" style="width: 15%; font-size: 1.4rem;">?</a>
 
             <!-- PRECEDENT (42.5%) -->
             {{ if gt .Page 1 }}
-            <a href="/?q={{.Query}}&page={{.PrevPage}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}&search_mode={{if .ShowSearch}}true{{else}}false{{end}}&last_page={{.LastPage}}"
+            <a href="/?q={{.Query}}&page={{.PrevPage}}&author={{.Author}}&series_id={{.SeriesID}}&search_mode={{if .ShowSearch}}true{{else}}false{{end}}&last_page={{.LastPage}}"
                 class="nav-btn" style="width: 42.5%;">&#9664;</a>
             {{ else }}
             <div class="nav-btn disabled" style="width: 42.5%;">&#9664;</div>
@@ -421,7 +421,7 @@
 
             <!-- SUIVANT (42.5%) -->
             {{ if .HasNext }}
-            <a href="/?q={{.Query}}&page={{.NextPage}}&author_id={{.AuthorID}}&series_id={{.SeriesID}}&search_mode={{if .ShowSearch}}true{{else}}false{{end}}&last_page={{.LastPage}}"
+            <a href="/?q={{.Query}}&page={{.NextPage}}&author={{.Author}}&series_id={{.SeriesID}}&search_mode={{if .ShowSearch}}true{{else}}false{{end}}&last_page={{.LastPage}}"
                 class="nav-btn" style="width: 42.5%;">&#9654;</a>
             {{ else }}
             <div class="nav-btn disabled" style="width: 42.5%;">&#9654;</div>

@@ -213,7 +213,7 @@
         <div class="header-table">
             <div class="cell-cover">
                 <div class="cover-wrapper">
-                    <div class="cover-img" style="background-image: url('/cover/{{.Book.ID}}?path={{.Book.Path}}');">
+                    <div class="cover-img" style="background-image: url('/cover/{{.Book.ID}}');">
                     </div>
                 </div>
             </div>
@@ -222,7 +222,7 @@
                 <h1>{{ .Book.Title }}</h1>
 
                 <div class="author">
-                    Par <a href="/?author_id={{.Book.AuthorID}}" style="color:inherit;">{{ .Book.Author }}</a>
+                    Par <a href="/?author={{.Book.PrimaryAuthor}}" style="color:inherit;">{{ .Book.Author }}</a>
                 </div>
 
                 {{ if .Book.Series }}
@@ -235,9 +235,9 @@
         </div>
 
         <div class="actions-stack">
-            <a href="/download/{{.Book.ID}}?path={{.Book.Path}}" class="btn-big">Standard ⬇</a>
+            <a href="/download/{{.Book.ID}}" class="btn-big">Standard ⬇</a>
             {{ if .Book.HasKepub }}
-            <a href="/download/{{.Book.ID}}?path={{.Book.Path}}&mode=kepub" class="btn-big secondary">Kobo ⬇</a>
+            <a href="/download/{{.Book.ID}}?mode=kepub" class="btn-big secondary">Kobo ⬇</a>
             {{ end }}
         </div>
 

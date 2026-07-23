@@ -4,6 +4,13 @@ services:
     container_name: joseph
     ports:
       - "8090:8080"
+    environment:
+      - BOOKORBIT_URL=${BOOKORBIT_URL}
+      - BOOKORBIT_OPDS_USER=${BOOKORBIT_OPDS_USER}
+      - BOOKORBIT_OPDS_PASSWORD=${BOOKORBIT_OPDS_PASSWORD}
     volumes:
-      - $LOCAL_LIBRARY:/books
+      - joseph_cache:/data/cache
     restart: unless-stopped
+
+volumes:
+  joseph_cache:

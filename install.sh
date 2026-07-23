@@ -61,10 +61,28 @@ if ! command -v go >/dev/null 2>&1; then
     arm64) GO_ARCH="arm64" ;;
     *) echo "Architecture non supportée par ce script : $ARCH" >&2; exit 1 ;;
   esac
-  curl -fsSL "https://go.dev/dl/go${GO_VERSION}.linux-${GO_ARCH}.tar.gz" -o /tmp/go.tar.gz
+
+  # Répertoire temporaire privé (pas de chemin fixe dans /tmp : évite qu'un
+  # symlink pré-existant ne détourne le téléchargement/l'extraction).
+  GO_TMP_DIR="$(mktemp -d)"
+  trap 'rm -rf "$GO_TMP_DIR"' EXIT
+  GO_TARBALL="$GO_TMP_DIR/go.tar.gz"
+  GO_ASSET="go${GO_VERSION}.linux-${GO_ARCH}.tar.gz"
+
+  curl -fsSL "https://go.dev/dl/${GO_ASSET}" -o "$GO_TARBALL"
+  # Intégrité de la chaîne d'approvisionnement : on vérifie le tarball contre
+  # le SHA256 officiel publié par go.dev avant de l'extraire en root.
+  EXPECTED_SHA256="$(curl -fsSL "https://go.dev/dl/${GO_ASSET}.sha256")"
+  ACTUAL_SHA256="$(sha256sum "$GO_TARBALL" | awk '{print $1}')"
+  if [[ "$EXPECTED_SHA256" != "$ACTUAL_SHA256" ]]; then
+    echo "Erreur : SHA256 du tarball Go invalide (attendu $EXPECTED_SHA256, obtenu $ACTUAL_SHA256)" >&2
+    exit 1
+  fi
+
   rm -rf /usr/local/go
-  tar -C /usr/local -xzf /tmp/go.tar.gz
-  rm -f /tmp/go.tar.gz
+  tar -C /usr/local -xzf "$GO_TARBALL"
+  rm -rf "$GO_TMP_DIR"
+  trap - EXIT
   ln -sf /usr/local/go/bin/go /usr/local/bin/go
   ln -sf /usr/local/go/bin/gofmt /usr/local/bin/gofmt
 fi
@@ -97,6 +115,11 @@ mkdir -p "$JOSEPH_CACHE_DIR"
 chown -R "$JOSEPH_USER":"$JOSEPH_USER" "$JOSEPH_DIR" "$JOSEPH_CACHE_DIR"
 
 echo "--- Fichier d'environnement ---"
+# Le fichier contient un secret (mot de passe OPDS) : on le crée avec des
+# permissions restrictives *avant* d'y écrire, pour qu'il ne soit jamais
+# lisible par d'autres utilisateurs même un court instant (pas de fenêtre
+# entre écriture et chmod).
+install -m 600 -o "$JOSEPH_USER" -g "$JOSEPH_USER" /dev/null "$ENV_FILE"
 cat > "$ENV_FILE" <<EOF
 BOOKORBIT_URL=$BOOKORBIT_URL
 BOOKORBIT_OPDS_USER=$BOOKORBIT_OPDS_USER
@@ -104,8 +127,6 @@ BOOKORBIT_OPDS_PASSWORD=$BOOKORBIT_OPDS_PASSWORD
 PORT=$JOSEPH_PORT
 CACHE_DIR=$JOSEPH_CACHE_DIR
 EOF
-chown "$JOSEPH_USER":"$JOSEPH_USER" "$ENV_FILE"
-chmod 600 "$ENV_FILE"
 
 echo "--- Service systemd ---"
 cat > "$SERVICE_FILE" <<EOF

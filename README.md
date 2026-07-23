@@ -21,7 +21,41 @@ L'OPDS de BookOrbit n'expose pas de route "un livre par id", seulement des flux 
 1. L'OPDS doit être activé (Réglages > OPDS, activé par défaut).
 2. Créer un utilisateur OPDS dédié à Joseph (Réglages > OPDS > Ajouter un utilisateur), distinct du compte web principal — Joseph n'a jamais besoin du mot de passe du compte principal.
 
-## 🚀 Installation rapide (Docker)
+## 🚀 Installation dans un LXC (scénario recommandé)
+
+Joseph est prévu pour tourner nativement dans son propre LXC (Proxmox), à côté du LXC BookOrbit — pas de Docker requis, un simple binaire Go + un service systemd, comme le reste des services `dns_xxx`/`port_xxx` de ce style de homelab.
+
+1. Créer un LXC Debian ou Ubuntu (template standard, quelques centaines de Mo suffisent — pas de conversion d'ebook lourde côté Joseph, tout est délégué à BookOrbit).
+2. Dans le LXC, en root :
+
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/hug-efrei/joseph/bookorbit-native/install.sh | bash
+   ```
+
+   (remplacer `bookorbit-native` par `main` une fois la branche fusionnée). Sans variables d'environnement, le script demande interactivement `BOOKORBIT_URL`, l'utilisateur et le mot de passe OPDS.
+
+   Pour une installation non interactive :
+
+   ```bash
+   BOOKORBIT_URL=http://192.168.1.24:3000 \
+   BOOKORBIT_OPDS_USER=joseph \
+   BOOKORBIT_OPDS_PASSWORD=xxxxx \
+   JOSEPH_REF=bookorbit-native \
+   bash install.sh
+   ```
+
+Le script installe Go si besoin, crée un utilisateur système `joseph` dédié (pas root), compile le binaire, écrit `/opt/joseph/.env` (permissions 600) et un service systemd `joseph.service` (`Restart=on-failure`), puis le démarre. Relancer le script met à jour une installation existante (git pull + rebuild + restart) au lieu d'en recréer une.
+
+Gestion du service :
+
+```bash
+systemctl status joseph
+journalctl -u joseph -f
+```
+
+Pour l'exposer automatiquement via Caddy (convention hve), ajouter les tags `dns_joseph;port_8080` sur le LXC dans Proxmox.
+
+## 🐳 Installation alternative (Docker)
 
 Créez un fichier `docker-compose.yml` :
 

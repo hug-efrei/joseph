@@ -12,6 +12,7 @@
 # + restart) au lieu de repartir de zéro.
 
 set -euo pipefail
+export LC_ALL=C DEBIAN_FRONTEND=noninteractive
 
 JOSEPH_REPO="${JOSEPH_REPO:-https://github.com/hug-efrei/joseph.git}"
 JOSEPH_REF="${JOSEPH_REF:-main}"
@@ -50,11 +51,10 @@ prompt_if_empty BOOKORBIT_OPDS_PASSWORD "Mot de passe OPDS" secret
 
 echo "--- Dépendances système ---"
 apt-get update -qq
-apt-get install -y -qq git curl ca-certificates >/dev/null
+apt-get install -y -qq git curl ca-certificates jq >/dev/null
 
 if ! command -v go >/dev/null 2>&1; then
   echo "--- Installation de Go ---"
-  GO_VERSION="1.25.4"
   ARCH="$(dpkg --print-architecture)"
   case "$ARCH" in
     amd64) GO_ARCH="amd64" ;;
@@ -62,17 +62,29 @@ if ! command -v go >/dev/null 2>&1; then
     *) echo "Architecture non supportée par ce script : $ARCH" >&2; exit 1 ;;
   esac
 
+  # On récupère la dernière version stable et son SHA256 officiel depuis
+  # l'API JSON de go.dev (pas de fichier .sha256 séparé par tarball, et pas
+  # de version codée en dur qui finirait par devenir obsolète).
+  RELEASE_JSON="$(curl -fsSL 'https://go.dev/dl/?mode=json')"
+  GO_ASSET="$(echo "$RELEASE_JSON" | jq -r --arg arch "$GO_ARCH" \
+    '[.[] | select(.stable==true)][0].files[] | select(.os=="linux" and .arch==$arch and .kind=="archive") | .filename')"
+  EXPECTED_SHA256="$(echo "$RELEASE_JSON" | jq -r --arg arch "$GO_ARCH" \
+    '[.[] | select(.stable==true)][0].files[] | select(.os=="linux" and .arch==$arch and .kind=="archive") | .sha256')"
+
+  if [[ -z "$GO_ASSET" || -z "$EXPECTED_SHA256" ]]; then
+    echo "Erreur : impossible de déterminer la dernière release Go pour linux/$GO_ARCH" >&2
+    exit 1
+  fi
+
   # Répertoire temporaire privé (pas de chemin fixe dans /tmp : évite qu'un
   # symlink pré-existant ne détourne le téléchargement/l'extraction).
   GO_TMP_DIR="$(mktemp -d)"
   trap 'rm -rf "$GO_TMP_DIR"' EXIT
   GO_TARBALL="$GO_TMP_DIR/go.tar.gz"
-  GO_ASSET="go${GO_VERSION}.linux-${GO_ARCH}.tar.gz"
 
   curl -fsSL "https://go.dev/dl/${GO_ASSET}" -o "$GO_TARBALL"
   # Intégrité de la chaîne d'approvisionnement : on vérifie le tarball contre
   # le SHA256 officiel publié par go.dev avant de l'extraire en root.
-  EXPECTED_SHA256="$(curl -fsSL "https://go.dev/dl/${GO_ASSET}.sha256")"
   ACTUAL_SHA256="$(sha256sum "$GO_TARBALL" | awk '{print $1}')"
   if [[ "$EXPECTED_SHA256" != "$ACTUAL_SHA256" ]]; then
     echo "Erreur : SHA256 du tarball Go invalide (attendu $EXPECTED_SHA256, obtenu $ACTUAL_SHA256)" >&2

@@ -14,13 +14,21 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-s -w' -o server main.go bookorbit.go
 
 # Étape 2 : Image finale (toute petite)
-FROM alpine:latest
+FROM alpine:3.21
 
-WORKDIR /root/
+RUN adduser -D -u 1000 joseph
+WORKDIR /app
 
 # On copie le binaire et les templates
 COPY --from=builder /app/server .
 COPY --from=builder /app/templates ./templates
+
+# Pré-crée le point de montage du cache avec le bon propriétaire : le volume
+# nommé hérite de cette ownership au premier montage (sinon root, illisible
+# pour l'utilisateur joseph non-root).
+RUN mkdir -p /data/cache && chown -R joseph:joseph /data/cache
+
+USER joseph
 
 # On expose le port
 EXPOSE 8080

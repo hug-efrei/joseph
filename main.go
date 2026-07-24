@@ -1,15 +1,18 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -19,7 +22,7 @@ import (
 var (
 	Port         = getEnv("PORT", "8080")
 	CacheDir     = getEnv("CACHE_DIR", "/data/cache/covers")
-	BooksPerPage = 24
+	BooksPerPage = getEnvInt("BOOKS_PER_PAGE", 24)
 )
 
 // Book est le modèle affiché par les templates. Il est reconstruit à chaque
@@ -263,7 +266,32 @@ func main() {
 		io.Copy(c.Writer, resp.Body)
 	})
 
-	r.Run(":" + Port)
+	srv := &http.Server{
+		Addr:              ":" + Port,
+		Handler:           r,
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       15 * time.Second,
+		WriteTimeout:      5 * time.Minute, // laisse le temps aux gros téléchargements epub/kepub sur liaison lente (Kobo)
+		IdleTimeout:       90 * time.Second,
+	}
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("erreur serveur HTTP : %v", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("arrêt en cours…")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatalf("arrêt forcé du serveur : %v", err)
+	}
+	log.Println("serveur arrêté proprement")
 }
 
 // pickFile choisit le fichier à télécharger selon la priorité de format :
@@ -300,6 +328,19 @@ func getEnv(key, fallback string) string {
 		return value
 	}
 	return fallback
+}
+
+func getEnvInt(key string, fallback int) int {
+	value, exists := os.LookupEnv(key)
+	if !exists {
+		return fallback
+	}
+	n, err := strconv.Atoi(value)
+	if err != nil {
+		log.Printf("⚠️  %s invalide (%q), valeur par défaut %d utilisée", key, value, fallback)
+		return fallback
+	}
+	return n
 }
 
 func requireEnv(key string) string {

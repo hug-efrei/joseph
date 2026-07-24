@@ -19,17 +19,28 @@ providers:
     proxmox:
       # URL de votre serveur Proxmox
       endpoint: "https://192.168.1.100:8006"
-      
+
       # Token API (Format: USER@REALM!TOKEN_ID=UUID)
       # À générer dans Proxmox: Datacenter -> Permissions -> API Tokens
+      #
+      # ⚠️  NE JAMAIS écrire le vrai token ici : ce fichier est versionné dans
+      # git. Passez-le en variable d'environnement au conteneur/service
+      # Traefik (TRAEFIK_PROVIDERS_PLUGIN_PROXMOX_APITOKEN=...) — Traefik
+      # dérive automatiquement une variable d'env pour chaque clé de la
+      # configuration statique. Gardez le placeholder ci-dessous tel quel
+      # dans ce dépôt.
       apiToken: "root@pam!traefik=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-      
+
       # Intervalle de mise à jour (en secondes)
       pollInterval: "10s"
-      
-      # Ignorer les erreurs de certificat (souvent nécessaire pour Proxmox self-signed)
+
+      # Ignorer les erreurs de certificat (souvent nécessaire pour Proxmox
+      # self-signed). C'est un compromis sécurité : ça désactive la
+      # vérification TLS de la connexion vers l'API Proxmox. Si possible,
+      # préférez importer le CA de Proxmox dans le trust store du conteneur
+      # Traefik et repasser cette valeur à false.
       insecureSkipVerify: true
-      
+
       # (Optionnel) Node spécifique ou clusters
       # node: "pve1"
 

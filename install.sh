@@ -115,9 +115,12 @@ fi
 
 if [[ -d "$JOSEPH_DIR/.git" ]]; then
   echo "--- Mise à jour du dépôt existant ---"
-  git -C "$JOSEPH_DIR" fetch --depth 1 origin "$JOSEPH_REF"
-  git -C "$JOSEPH_DIR" checkout -q "$JOSEPH_REF"
-  git -C "$JOSEPH_DIR" reset --hard "origin/$JOSEPH_REF" 2>/dev/null || git -C "$JOSEPH_DIR" reset --hard FETCH_HEAD
+  # Le dépôt appartient à $JOSEPH_USER (chown fait en fin d'installation
+  # précédente) : on exécute git en tant que cet utilisateur plutôt qu'en
+  # root, sinon git refuse l'opération ("detected dubious ownership").
+  runuser -u "$JOSEPH_USER" -- git -C "$JOSEPH_DIR" fetch --depth 1 origin "$JOSEPH_REF"
+  runuser -u "$JOSEPH_USER" -- git -C "$JOSEPH_DIR" checkout -q "$JOSEPH_REF"
+  runuser -u "$JOSEPH_USER" -- git -C "$JOSEPH_DIR" reset --hard "origin/$JOSEPH_REF" 2>/dev/null || runuser -u "$JOSEPH_USER" -- git -C "$JOSEPH_DIR" reset --hard FETCH_HEAD
 else
   echo "--- Clonage du dépôt (ref: $JOSEPH_REF) ---"
   rm -rf "$JOSEPH_DIR"
